@@ -19,7 +19,7 @@ I divided the work 3 parts : compute the correct matrix and distortion coefficie
 
 #### Compute the correction matrix and distortion coefficients [calibrationBuilder](./camera_calibration/calibrationBuilder.py)
 
- To compute a the correct matrix and distortion coefficients from the chessboard images inside *[./assets/camera_cal](./assets/camera_cal/)*, I first use the function [getCornersMatrix](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/camera_calibration/calibrationBuilder.py#L39-L51) to find the chessboard matrix. I [append all this matrixes](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/camera_calibration/calibrationBuilder.py#L23-L25) and use them inside [cv2.calibrateCamera](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/camera_calibration/calibrationBuilder.py#L29-L30) to get the correct matrix (**mtx**) and distortion coefficients (**dist**).
+ To compute a the correct matrix and distortion coefficients from the chessboard images inside *[./assets/camera_cal](./assets/camera_cal/)*, I first use the function [getCornersMatrix](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/camera_calibration/calibrationBuilder.py#L39-L51) to find the chessboard matrix. I [append all this matrixes](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/camera_calibration/calibrationBuilder.py#L23-L25) inside **imgPoints**(2D representation) and their 3D representation **objPoints** to use them inside [cv2.calibrateCamera](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/camera_calibration/calibrationBuilder.py#L29-L30) to get the correct matrix (**mtx**) and distortion coefficients (**dist**).
 
  #### Undistort function
 
