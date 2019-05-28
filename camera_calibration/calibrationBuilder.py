@@ -8,6 +8,7 @@ from common import logger
 def calibrationMatrix(rows, cols, imgFolder):
     log = logger.Logger.getInstance();
     fileList = os.listdir(imgFolder)
+
     # Set the default value for calibrateCamera
     objp = np.zeros((rows*cols,3), np.float32)
     objp[:,:2] = np.mgrid[0:rows,0:cols].T.reshape(-1,2)
@@ -25,7 +26,7 @@ def calibrationMatrix(rows, cols, imgFolder):
                 imgPoints.append(corners)
             except ValueError as error:
                 log.warning("%s => %s"%(filename,error.args))
-    # Get the widthang height of the image for cv2.calibrateCamera
+    # Get the width and height of the image for cv2.calibrateCamera
     imgShape = (currentImage.shape[::-1][1], currentImage.shape[::-1][2])
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objPoints, imgPoints, imgShape, None, None)
 
@@ -49,11 +50,3 @@ def getCornersMatrix(rows, cols, img, createPrefixedFilePath):
             cv2.imwrite(createPrefixedFilePath("chessboard"), img)
         return corners
     raise ValueError('Can\'t find a chessboard pattern')
-
-def undistortBuilder(mtx, dist):
-    def undistortImage( img, path):
-        undistortedImage = cv2.undistort(img, mtx, dist, None, mtx)
-        if (os.environ['PYTHON_ENV'] == 'debug'):
-            cv2.imwrite(path, undistortedImage)
-        return undistortedImage
-    return undistortImage;
