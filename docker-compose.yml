@@ -1,0 +1,9 @@
+version: "3.0"
+services:
+
+  python:
+    build: ./
+    environment:
+      ASSETS_FOLDER: "/app/assets"
+    volumes:
+      - ./:/app
