@@ -25,4 +25,14 @@ I divided the work 3 parts : compute the correct matrix and distortion coefficie
 
  OpenCV exposes the function [](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/camera_calibration/undistort.py#L7). We have to simply give it the parameters found before and the image.
 
- For my personnal ease I choose to encapsulate it inside a [builder](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/camera_calibration/undistort.py#L5) who will return a closure with the **mtx** and **dist**, so I can simply pass it to other functions as more simple function without having to reconstruct it.
+ For my personnal ease I choose to encapsulate it inside a [higher order function](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/camera_calibration/undistort.py#L5) who will return a closure with the **mtx** and **dist**, so I can simply pass it to other functions as more simple function without having to reconstruct it.
+
+### Pipeline
+
+#### Provide an example of a distortion-corrected image.
+
+We simply apply the function **undistortImage** (we pass the image and the path to wish to save the undistorted image to have it).
+
+| Distorted image | Undistorted Image |
+|---|---|
+|![alt text](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/test6.jpg)|![alt text](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/test6.jpg)|

@@ -23,4 +23,4 @@ if __name__ == '__main__':
             if (re.search(r"^[a-z0-9_]+\.(jpg|png)$", filename)):
                 currentImage = cv2.imread("%s/%s" % (testImageFolder, filename))
                 currentImagePath = "%s/undistorted-%s" % (testImageFolder, filename)
-                undistortImage(currentImage, currentImagePath)
+                undistortedImage = undistortImage(currentImage, currentImagePath)
