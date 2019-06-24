@@ -38,3 +38,14 @@ We simply apply the function **undistortImage** (we pass the image and the path 
 |![alt text](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/test6.jpg)|![alt text](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/test6.jpg)|
 
 #### Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image. Provide an example of a binary image result.
+
+The code use to create the binary image is [here](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/binarization/__init__.py).
+I first create masks for [white lines](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/binarization/colorTransformations.py#L20), [yellow lines](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/binarization/colorTransformations.py#L13) and [absolute sobel](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/binarization/sobelUtils.py#L5) for the image. I combine then using [logical_or](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/binarization/__init__.py#L13) to have a unique binary image combining the three views.
+Finally I found that using a [morphological closing](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/binarization/__init__.py#L21) helps to reduce noise.
+
+| Test image | white mask | yellow mask |
+|---|---|---|
+|![test](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/straight_lines1.jpg)|![white](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/straight_lines1-white_thresholded.jpg)|![yellow](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/straight_lines1-yellow_thresholded.jpg)|
+|---|---|---|
+| abs sobel image | combined mask | closed mask |
+|![abs sobel](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/straight_lines1-abs_sobel_thresholded.jpg)|![combined](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/straight_lines1-combined_thresholded.jpg)|![closed](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/straight_lines1--binary_image.jpg)|
