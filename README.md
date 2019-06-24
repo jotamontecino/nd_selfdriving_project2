@@ -31,8 +31,10 @@ I divided the work 3 parts : compute the correct matrix and distortion coefficie
 
 #### Provide an example of a distortion-corrected image.
 
-We simply apply the function **undistortImage** (we pass the image and the path to wish to save the undistorted image to have it).
+We simply apply the function **undistortImage** (we pass the image and the path to wish to save the undistorted image to have it). There is a slight difference (on the bottom corners).
 
 | Distorted image | Undistorted Image |
 |---|---|
 |![alt text](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/test6.jpg)|![alt text](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/test6.jpg)|
+
+#### Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image. Provide an example of a binary image result.

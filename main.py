@@ -5,6 +5,7 @@ import re
 
 from common import logger
 from camera_calibration import undistortImageBuilder
+from binarization import binarizeImage
 
 if __name__ == '__main__':
     # logging.basicConfig(filename='myapp.log', level=logging.INFO)
@@ -24,3 +25,4 @@ if __name__ == '__main__':
                 currentImage = cv2.imread("%s/%s" % (testImageFolder, filename))
                 currentImagePath = "%s/undistorted-%s" % (testImageFolder, filename)
                 undistortedImage = undistortImage(currentImage, currentImagePath)
+                binarizedImage = binarizeImage(undistortedImage, "%s/%s" % (testImageFolder, filename))

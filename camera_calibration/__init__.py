@@ -1,6 +1,5 @@
 import os
 import cv2
-import matplotlib.image as mpimg
 import re
 
 from common.logger import Logger
