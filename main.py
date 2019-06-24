@@ -4,7 +4,7 @@ import os
 import re
 import numpy as np
 
-
+from laneDetection import laneDetector
 from common import logger
 from camera_calibration import undistortImageBuilder
 from binarization import binarizeImage
@@ -16,7 +16,8 @@ if __name__ == '__main__':
     log.info("Process Start")
 
     undistortImage = undistortImageBuilder()
-    warpImage = None
+    birdViewImage = None
+    dashCamView = None
 
     if (os.environ['INPUT_TYPE'] == "video"):
         pass
@@ -30,12 +31,19 @@ if __name__ == '__main__':
                 currentImagePath = "%s/undistorted-%s" % (testImageFolder, filename)
                 undistortedImage = undistortImage(currentImage, currentImagePath)
                 binarizedImage = binarizeImage(undistortedImage, "%s/%s" % (testImageFolder, filename))
-                if (warpImage is None):
-                    matrix = transformMatrix(currentImage, 450, 640, 68)
-                    warpImage = warperBuilder(matrix)
+                if (birdViewImage is None):
+                    matrix, invMatrix = transformMatrix(currentImage, 450, 640, 68)
+                    birdViewImage = warperBuilder(matrix)
+                    dashCamView = warperBuilder(invMatrix)
                 tmpImage = np.copy(binarizedImage).astype(np.uint8)
                 binaryThreshold = np.zeros_like(tmpImage)
                 binaryThreshold[(tmpImage > 0)] = 255
-                warpedImage = warpImage(binaryThreshold, "%s/%s" % (testImageFolder, filename))
+                warpedImage = birdViewImage(binaryThreshold, "%s/%s" % (testImageFolder, filename))
                 if (os.environ['PYTHON_ENV'] == "debug"):
-                    warpImage(currentImage, currentImagePath)
+                    birdViewImage(currentImage, currentImagePath)
+                lanePolyBirdView = laneDetector(warpedImage, "%s/%s" % (testImageFolder, filename))
+                lanePolyDashCamView = dashCamView(lanePolyBirdView)
+                if (os.environ['PYTHON_ENV'] == "debug"):
+                    path = currentImagePath.replace(".jpg", "-lanes.jpg")
+                    imageWithLane = cv2.addWeighted(currentImage, 1, lanePolyDashCamView, 0.5, 0)
+                    cv2.imwrite(path, imageWithLane)
