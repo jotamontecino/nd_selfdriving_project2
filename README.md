@@ -49,3 +49,14 @@ Finally I found that using a [morphological closing](https://github.com/jotamont
 |---|---|---|
 | abs sobel image | combined mask | closed mask |
 |![abs sobel](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/straight_lines1-abs_sobel_thresholded.jpg)|![combined](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/straight_lines1-combined_thresholded.jpg)|![closed](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/straight_lines1--binary_image.jpg)|
+
+#### Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
+
+The code describing this part can be found inside the [perspectiveTransformations](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/perspectiveTransformations/__init__.py) module.
+I first use a function to create the matrix [(**transformMatrix**)](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/perspectiveTransformations/__init__.py#L6) used for the perspective warp. I pass the Y(**yTop**) and X(**xTop**) of the central point (top center) of my quadrilateral and the width offset(**offsetWidth**) applied to X to create have my left and right points.
+
+I created a closure around the warping function [(**warperBuilder**)](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/perspectiveTransformations/__init__.py#L23), so I only pass the transformation matrix at its creation. And I use the enclosed function(**warper**).
+
+| Test image | Warped Image |
+|---|---|
+|![test](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/undistorted-straight_lines1.jpg)|![warped](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/undistorted-straight_lines1-birdEye.jpg)
