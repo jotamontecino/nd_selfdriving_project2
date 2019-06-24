@@ -31,7 +31,7 @@ if __name__ == '__main__':
                 undistortedImage = undistortImage(currentImage, currentImagePath)
                 binarizedImage = binarizeImage(undistortedImage, "%s/%s" % (testImageFolder, filename))
                 if (warpImage is None):
-                    matrix = transformMatrix(currentImage)
+                    matrix = transformMatrix(currentImage, 450, 640, 68)
                     warpImage = warperBuilder(matrix)
                 tmpImage = np.copy(binarizedImage).astype(np.uint8)
                 binaryThreshold = np.zeros_like(tmpImage)
