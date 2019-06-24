@@ -31,7 +31,7 @@ def warperBuilder(matrix):
             flags=cv2.INTER_LINEAR
         )
         if (os.environ['PYTHON_ENV'] == 'debug' and pathToSave is not None):
-            path = pathToSave.replace(".jpg", "-birdEye1.jpg")
+            path = pathToSave.replace(".jpg", "-birdEye.jpg")
             cv2.imwrite(path, warpedImage)
         return warpedImage
     return warper
