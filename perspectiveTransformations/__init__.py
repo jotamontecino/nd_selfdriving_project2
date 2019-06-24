@@ -3,24 +3,19 @@ import cv2
 import numpy as np
 
 
-def transformMatrix(img):
-    offset = 0
-    xl = 0
-    y = 450
-    xr = 1280
-    width = 640
-    offsetWidth = 68
+def transformMatrix(img, yTop, xTop, offsetWidth):
+    h, w = img.shape[:2]
     src = np.float32([
-        [xl, img.shape[0]],
-        [xr, img.shape[0]],
-        [width-offsetWidth, y],
-        [width+offsetWidth, y]
+        [0, h],
+        [w, h],
+        [xTop-offsetWidth, yTop],
+        [xTop+offsetWidth, yTop]
     ])
     dst = np.float32([
-        [offset, img.shape[0]],
-        [img.shape[1]-offset, img.shape[0]],
-        [offset, offset],
-        [img.shape[1]-offset, offset]
+        [0, h],
+        [w, h],
+        [0, 0],
+        [w, 0]
     ])
     return cv2.getPerspectiveTransform(src, dst)
 
