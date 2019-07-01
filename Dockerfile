@@ -1,4 +1,7 @@
-FROM debian:stretch-slim
+FROM python:3
+
+
+RUN apt-get -y update && apt-get -y install libav-tools imagemagick libopencv-dev python-opencv
 
 ENV PYTHONPATH=/app/src \
     PYTHON_VERSION=3 \
@@ -32,6 +35,8 @@ RUN mkdir /app/ &&\
             python3-unidecode &&\
     rm -rf /var/lib/apt/lists/*
 
+# RUN apt-get install  python2.7 && python-pip
+# RUN pip install imageio-ffmpeg
 
 # Install python-boilerplate from pip
 

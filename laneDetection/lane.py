@@ -12,18 +12,30 @@ class Lane:
         self.CurvatureRadius = None
         self.pathToSave = pathToSave
         self.env = os.environ['PYTHON_ENV']
+        self.leftPastFit = None
+        self.rightPastFit = None
 
     def processImage(self, image):
-        leftX, leftY, rightX, rightY, windowedImage = self.findLanePixels(image)
-        if (self.env and self.pathToSave is not None):
+        leftX = None
+        leftY = None
+        rightX = None
+        rightY = None
+        windowedImage = None
+        if (self.leftPastFit is not None or self.rightPastFit is not None):
+            leftX, leftY, rightX, rightY, windowedImage = self.findPixelWithOldFit(image)
+        else:
+            leftX, leftY, rightX, rightY, windowedImage = self.findLanePixels(image)
+        if (self.env == "debug" and self.pathToSave is not None):
             path = self.pathToSave.replace(".jpg", "-windowed.jpg")
             cv2.imwrite(path, windowedImage)
         leftFit, rightFit = self.fitPolynomial(leftX, leftY, rightX, rightY)
-        laneImage, laneMask = self.drawLane(image, leftFit, rightFit)
-        if (self.env == 'debug' and self.pathToSave is not None):
-            path = self.pathToSave.replace(".jpg", "-laneDrawn.jpg")
-            cv2.imwrite(path, laneImage)
-        return laneMask
+        if (leftFit is not None and rightFit is not None):
+            laneImage, laneMask = self.drawLane(image, leftFit, rightFit)
+            if (self.env == 'debug' and self.pathToSave is not None):
+                path = self.pathToSave.replace(".jpg", "-laneDrawn.jpg")
+                cv2.imwrite(path, laneImage)
+            return laneMask
+        return None
 
     def drawLane(self, image, leftFit, rightFit):
         h, w = image.shape
@@ -54,10 +66,46 @@ class Lane:
     def drawLine(self, line, plotY):
         return self.drawPoly(line, line, plotY)
 
-    def fitPolynomial(self, leftx, lefty, rightx, righty):
-        leftFit = np.polyfit(lefty, leftx, 2)
-        rightFit = np.polyfit(righty, rightx, 2)
-        return leftFit, rightFit
+    def fitPolynomial(self, leftx, lefty, rightx, righty, minpix=0):
+        try:
+            leftFit = self.leftPastFit
+            rightFit = self.rightPastFit
+            if ( leftx.size > minpix ):
+                leftFit = np.polyfit(lefty, leftx, 2)
+                self.leftPastFit = leftFit
+            if ( rightx.size > minpix ):
+                rightFit = np.polyfit(righty, rightx, 2)
+                self.rightPastFit = rightFit
+            return leftFit, rightFit
+        except ValueError:
+            return None, None
+
+    def findPixelWithOldFit(self, binary_warped):
+        margin = 100
+        if (self.leftPastFit is not None and self.rightPastFit is not None):
+            nonzero = binary_warped.nonzero()
+            nonzeroy = np.array(nonzero[0])
+            nonzerox = np.array(nonzero[1])
+            leftLaneInds = (
+                (nonzerox > (self.leftPastFit[0]*(nonzeroy**2) + self.leftPastFit[1]*nonzeroy +
+        self.leftPastFit[2] - margin)) &
+                (nonzerox < (self.leftPastFit[0]*(nonzeroy**2) +
+        self.leftPastFit[1]*nonzeroy + self.leftPastFit[2] + margin))
+            )
+
+            right_lane_inds = ((nonzerox > (self.rightPastFit[0]*(nonzeroy**2) + self.rightPastFit[1]*nonzeroy +
+        self.rightPastFit[2] - margin)) & (nonzerox < (self.rightPastFit[0]*(nonzeroy**2) +
+        self.rightPastFit[1]*nonzeroy + self.rightPastFit[2] + margin)))
+
+            leftx = nonzerox[leftLaneInds]
+            lefty = nonzeroy[leftLaneInds]
+            rightx = nonzerox[right_lane_inds]
+            righty = nonzeroy[right_lane_inds]
+            return leftx, lefty, rightx, righty, binary_warped
+        else:
+            print("TUTUTUT")
+        # else:
+        #     raise Error
 
     def findLanePixels(self, binary_warped, nwindows = 10, margin = 100, minpix = 50, windowsColor=(0,255,255)):
         height, width = binary_warped.shape
@@ -127,7 +175,6 @@ class Lane:
             # Append these indices to the lists
             left_lane_inds.append(good_left_inds)
             right_lane_inds.append(good_right_inds)
-
             ### TO-DO: If you found > minpix pixels, recenter next window ###
             if len(good_left_inds) > minpix:
                 leftXCurrent = np.int(np.mean(nonzerox[good_left_inds]))

@@ -6,6 +6,6 @@ services:
     environment:
       ASSETS_FOLDER: "/app/assets"
       PYTHON_ENV: "debug"
-      INPUT_TYPE: "images"
+      INPUT_TYPE: "video"
     volumes:
       - ./:/app

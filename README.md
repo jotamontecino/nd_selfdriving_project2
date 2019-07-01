@@ -60,3 +60,7 @@ I created a closure around the warping function [(**warperBuilder**)](https://gi
 | Test image | Warped Image |
 |---|---|
 |![test](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/undistorted-straight_lines1.jpg)|![warped](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_images/undistorted-straight_lines1-birdEye.jpg)
+
+#### Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
+
+All the code relative to lane identification is locate [here](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py).

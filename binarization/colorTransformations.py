@@ -11,13 +11,14 @@ def hlsTransformation(image, minThresold, maxThresold):
 
 
 def yellow(image):
-    yellowMinThresholds = np.array([10, 50, 100], dtype=np.uint8)
+    yellowMinThresholds = np.array([10, 50, 50], dtype=np.uint8)
     yellowMaxThresholds = np.array([70, 255, 255], dtype=np.uint8)
     combinedImg = hlsTransformation(image, yellowMinThresholds, yellowMaxThresholds)
     return combinedImg
 
 
 def white(image):
-    Lchannel = image[:,:,1]
-    whiteColorImage = cv2.inRange(Lchannel, 200, 255)
+    hlsImage = cv2.cvtColor(image, cv2.COLOR_BGR2HLS)
+    Lchannel = hlsImage[:,:,1]
+    whiteColorImage = cv2.inRange(Lchannel, 220, 255)
     return whiteColorImage
