@@ -96,3 +96,12 @@ After I have a first detection done by **findLanePixels**, I use **findPixelWith
 #### Provide a link to your final video output. Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!)
 
 [Result](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/assets/test_video/result.mp4)
+
+
+### Discussion
+
+#### Briefly discuss any problems / issues you faced in your implementation of this project. Where will your pipeline likely fail? What could you do to make it more robust?
+
+I found that creating a good binary image to work with is the most difficult part. I could make it work with the challenge videos, as I got always to much noise. That resulted on bad lane detection.
+
+There is also the probeme of calculating a road, when the lines are not visible or even not drawn. As it often happen in city road in Europe/South America.
