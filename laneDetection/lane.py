@@ -1,7 +1,7 @@
 import os
 import cv2
 import numpy as np
-
+from collections import deque
 
 class Lane:
     """
@@ -12,8 +12,18 @@ class Lane:
         self.CurvatureRadius = None
         self.pathToSave = pathToSave
         self.env = os.environ['PYTHON_ENV']
+        self.leftPoly = deque(maxlen=5)
         self.leftPastFit = None
+        self.rightPoly = deque(maxlen=5)
         self.rightPastFit = None
+        self.leftPolyMeter = deque(maxlen=5)
+        self.leftPastFitMeter = None
+        self.rightPolyMeter = deque(maxlen=5)
+        self.rightPastFitMeter = None
+        self.yRatio = 30/720 # meters per pixel in y dimension
+        self.xRatio = 3.7/700 # meters per pixel in x dimension
+        self.imageWidth = 1
+        self.imageHeight = 1
 
     def processImage(self, image):
         leftX = None
@@ -21,6 +31,7 @@ class Lane:
         rightX = None
         rightY = None
         windowedImage = None
+        self.imageHeight, self.imageWidth = image.shape
         if (self.leftPastFit is not None or self.rightPastFit is not None):
             leftX, leftY, rightX, rightY, windowedImage = self.findPixelWithOldFit(image)
         else:
@@ -34,7 +45,7 @@ class Lane:
             if (self.env == 'debug' and self.pathToSave is not None):
                 path = self.pathToSave.replace(".jpg", "-laneDrawn.jpg")
                 cv2.imwrite(path, laneImage)
-            return laneMask
+            return laneMask, self.getCurvature(), self.getCurvature('y'), self.getOffsetPosition()
         return None
 
     def drawLane(self, image, leftFit, rightFit):
@@ -73,15 +84,19 @@ class Lane:
             if ( leftx.size > minpix ):
                 leftFit = np.polyfit(lefty, leftx, 2)
                 self.leftPastFit = leftFit
+                self.leftPastFitMeter = np.polyfit(lefty*self.yRatio, leftx*self.xRatio, 2)
+                self.smoothPolynomial()
             if ( rightx.size > minpix ):
                 rightFit = np.polyfit(righty, rightx, 2)
                 self.rightPastFit = rightFit
-            return leftFit, rightFit
+                self.rightPastFitMeter = np.polyfit(righty*self.yRatio, rightx*self.xRatio, 2)
+                self.smoothPolynomial('y')
+            return self.getSmoothedLeftFit(), self.getSmoothedRightFit()
         except ValueError:
             return None, None
 
     def findPixelWithOldFit(self, binary_warped):
-        margin = 100
+        margin = 50
         if (self.leftPastFit is not None and self.rightPastFit is not None):
             nonzero = binary_warped.nonzero()
             nonzeroy = np.array(nonzero[0])
@@ -103,9 +118,7 @@ class Lane:
             righty = nonzeroy[right_lane_inds]
             return leftx, lefty, rightx, righty, binary_warped
         else:
-            print("TUTUTUT")
-        # else:
-        #     raise Error
+            print("Past fit undefined")
 
     def findLanePixels(self, binary_warped, nwindows = 10, margin = 100, minpix = 50, windowsColor=(0,255,255)):
         height, width = binary_warped.shape
@@ -197,3 +210,43 @@ class Lane:
         righty = nonzeroy[right_lane_inds]
 
         return leftx, lefty, rightx, righty, out_img
+
+    def getSmoothedLeftFit(self):
+        return np.mean(self.leftPoly, axis=0)
+
+    def getSmoothedRightFit(self):
+        return np.mean(self.rightPoly, axis=0)
+
+    def getSmoothedLeftFitMeter(self):
+        return np.mean(self.leftPoly, axis=0)
+
+    def getSmoothedRightFitMeter(self):
+        return np.mean(self.rightPoly, axis=0)
+
+    def smoothPolynomial(self, axis='x'):
+        if (axis == 'x'):
+            self.leftPoly.append(self.leftPastFit)
+            self.leftPolyMeter.append(self.leftPastFitMeter)
+        else:
+            self.rightPoly.append(self.rightPastFit)
+            self.rightPolyMeter.append(self.rightPastFitMeter)
+        return None
+
+    def getCurvature(self, line='left'):
+        poly = None
+        yEval = 0
+        if (line == 'left'):
+            poly = self.getSmoothedLeftFitMeter()
+        else:
+            poly = self.getSmoothedRightFitMeter()
+        return ((1 + (2 * poly[0] * yEval + poly[1]) ** 2) ** 1.5) / np.absolute(2 * poly[0])
+
+
+    def getOffsetPosition(self):
+        self.imageHeight
+        leftFit = self.getSmoothedLeftFit()
+        rightFit = self.getSmoothedRightFit()
+        leftPoint = leftFit[0]*self.imageHeight**2 + leftFit[1]*self.imageHeight + leftFit[2]
+        rightPoint = rightFit[0]*self.imageHeight**2 + rightFit[1]*self.imageHeight + rightFit[2]
+        laneCenter = leftPoint + (rightPoint - leftPoint)//2
+        return (self.imageWidth/2 - laneCenter) * self.xRatio

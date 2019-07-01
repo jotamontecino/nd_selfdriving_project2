@@ -31,15 +31,10 @@ class Processor:
                 return lane
             self.lane = createLane
 
-    def processImage(self, currentImageTmp, currentImagePathTmp=None):
+    def processImage(self, currentImageTmp, currentImagePath=None):
         currentImage = currentImageTmp
         if (self.type == "VID"):
             currentImage = cv2.cvtColor(currentImageTmp, cv2.COLOR_RGB2BGR)
-
-        currentImagePath = currentImagePathTmp
-        if (currentImagePath is None and self.index < 10):
-            currentImagePath = self.path.replace("_index", "%d"%(self.index))
-            self.index = self.index + 1
         # currentImagePath = None
         undistortedImage = self.undistortImage(currentImage, currentImagePath)
         binarizedImage = binarizeImage(undistortedImage, currentImagePath)
@@ -54,10 +49,14 @@ class Processor:
         if (os.environ['PYTHON_ENV'] == "debug" and currentImagePath is not None):
             self.birdViewImage(currentImage, currentImagePath)
         lane = self.lane(currentImagePath)
-        lanePolyBirdView = lane.processImage(warpedImage)
+        lanePolyBirdView, leftCurv, rightCurv, centerOffset = lane.processImage(warpedImage)
         if (lanePolyBirdView is not None):
             lanePolyDashCamView = self.dashCamView(lanePolyBirdView)
             imageWithLane = cv2.addWeighted(currentImage, 1, lanePolyDashCamView, 0.5, 0)
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            cv2.putText(imageWithLane, 'Left curvature radius: {:.02f}m'.format(leftCurv), (840, 60), font, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(imageWithLane, 'Right curvature radius: {:.02f}m'.format(rightCurv), (840, 90), font, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(imageWithLane, 'Center offset: {:.02f}m'.format(centerOffset), (840, 120), font, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
             if (os.environ['PYTHON_ENV'] == "debug" and currentImagePath is not None):
                 path = currentImagePath.replace(".jpg", "-lanes.jpg")
                 cv2.imwrite(path, imageWithLane)
