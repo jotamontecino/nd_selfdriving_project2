@@ -65,31 +65,31 @@ I created a closure around the warping function [(**warperBuilder**)](https://gi
 
 All the code relative to lane identification is locate [here](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py).
 
-I use a [strategy](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L24) to apply two differents detection functions : [findLanePixels](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L110) and [findPixelWithOldFit](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L83).
+I use a [strategy](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L35) to apply two differents detection functions : [findLanePixels](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L123) and [findPixelWithOldFit](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L98).
 
-I first use **findLanePixels**, to make our first detection. I use the histogram function to find some local maximum pixel concentration. We choose the [left](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L117) and [right](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L118) maximums to start our boxing. I start to iterate through my total windows (10 by default), to get all pixels inside the [left](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L162) and [right](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L168) boxes.
+I first use **findLanePixels**, to make our first detection. I use the histogram function to find some local maximum pixel concentration. We choose the [left](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L130) and [right](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L131) maximums to start our boxing. I start to iterate through my total windows (10 by default), to get all pixels inside the [left](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L175) and [right](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L181) boxes.
 
 ![Windowed](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/writeup_assets/test2-windowed.jpg)
 
-Finally if I have enough pixels inside a box, I set the next box center as the [mean X of all the detected pixels](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L179) and add them to [detected arrays](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L176).
+Finally if I have enough pixels inside a box, I set the next box center as the [mean X of all the detected pixels](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L193) and add them to [detected arrays](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L200).
 
-Before returning the selected pixels I [discriminate](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L193) the pixels by X/Y and left/right lane.
+Before returning the selected pixels I [discriminate](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L207) the pixels by X/Y and left/right lane.
 
-Now I have **leftx**/**lefty** and **rightx**/**righty** for all found pixels for the lane (right/left lines). I then pass them to [fitPolynomial](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L69). Inside I use the **np.polyfit** function to calculate the polynomial that fit through all selected pixels.
+Now I have **leftx**/**lefty** and **rightx**/**righty** for all found pixels for the lane (right/left lines). I then pass them to [fitPolynomial](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L85). Inside I use the **np.polyfit** function to calculate the polynomial that fit through all selected pixels.
 If found I save it to **self.rightPastFit** and **self.leftPastFit**, to use in the next frame.
 
-After I have a first detection done by **findLanePixels**, I use **findPixelWithOldFit**. Here I calculate new lines by using the last polynomial and a margin, and I [select all pixels inside them](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L89). Finally I pass the found pixels to **fitPolynomial**.
+After I have a first detection done by **findLanePixels**, I use **findPixelWithOldFit**. Here I calculate new lines by using the last polynomial and a margin, and I [select all pixels inside them](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L104). Finally I pass the found pixels to **fitPolynomial**.
 
 
 #### Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-To calculate the Curvature, I calculate the polynomial in real space (Y * Pixel to meters ratio) for both lines and stock it. I calculate the curvature using the formula: ![function](sdqfqsdq).
+[getCurvature](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L235): To calculate the Curvature, I calculate the polynomial in real space (Y * Pixel to meters ratio) for both lines and stock it. I calculate the curvature using the formula: ![function](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/writeup_assets/curveFn.svg).
 
-To get the position of the vehicule with respect to center, I mean the last 5 polynomials, and calculate the X value at the bottom of the image (image height). I calculate the lane width, then the lane center from the left border and finally the difference beetwen the center of the image (image width) and the calculated lane center.
-
-
+[getOffsetPosition](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/laneDetection/lane.py#L245): To get the position of the vehicule with respect to center, I mean the last 5 polynomials, and calculate the X value at the bottom of the image (image height). I calculate the lane width, then the lane center from the left border and finally the difference beetwen the center of the image (image width) and the calculated lane center.
 
 #### Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
+
+![Final image](https://github.com/jotamontecino/nd_selfdriving_project2/blob/masterwriteup_assets/undistorted-test5-lanes.jpg)
 
 ### Pipeline (video)
 
