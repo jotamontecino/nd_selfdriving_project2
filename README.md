@@ -89,7 +89,7 @@ After I have a first detection done by **findLanePixels**, I use **findPixelWith
 
 #### Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-![Final image](https://github.com/jotamontecino/nd_selfdriving_project2/blob/masterwriteup_assets/undistorted-test5-lanes.jpg)
+![Final image](https://github.com/jotamontecino/nd_selfdriving_project2/blob/master/writeup_assets/undistorted-test5-lanes.jpg)
 
 ### Pipeline (video)
 
